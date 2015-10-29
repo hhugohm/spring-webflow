@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+           start-state="showFormUser">
+
+	<!-- el pojo debe ser  Serializable -->
+	<var name="user" class="org.neos.webflow.domain.User" />
+	
+	<!-- Display the login page -->
+	<view-state id="showFormUser" view="/WEB-INF/flows/newuser/addNewUser.jsp" model="user">
+		<transition on="newUserEntered" to="performNewUserAction"   history="discard" />
+	</view-state>
+																<!-- result="flowScope.user"  result-type="dataModel"  dataModel= alias tipo de objeto Java-->
+	<action-state id="performNewUserAction"   >
+		<evaluate expression="userService.performNewUser(user)"   result="flowScope.success"  result-type="string" />
+			<transition to="displaynewUserSuccessView">
+			</transition>
+		<transition on-exception="org.neos.webflow.exceptions.IncorrectNewUserException" to="displaynewUserErrorView" />
+	</action-state>
+	
+	<view-state id="displaynewUserErrorView" view="/WEB-INF/flows/newuser/newuser_error.jsp">
+		<transition  to="showFormUser">
+		</transition>
+	</view-state>
+	 
+	<view-state id="displaynewUserSuccessView" view="/WEB-INF/flows/newuser/newuser_success.jsp"/>
+	
+	
+	<!--  
+	<end-state id="displaynewUserSuccessView"  view="/WEB-INF/flows/login/display_login_success.jsp"/>
+	-->
+	
+</flow>

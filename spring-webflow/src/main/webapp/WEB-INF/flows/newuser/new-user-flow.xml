@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+	start-state="showFormUser">
+
+	<!-- el pojo debe ser Serializable -->
+	<var name="user" class="org.neos.webflow.domain.User" />
+	<!-- el pojo debe ser Serializable -->
+	<var name="personal" class="org.neos.webflow.domain.Personal" />
+
+	<!-- Display the login page -->
+	<view-state id="showFormUser" view="/WEB-INF/flows/newuser/addNewUser.jsp" model="user">
+		<transition on="newUserEntered" to="performNewUserAction"   validate="true"   history="discard" /> <!-- si no se necesita el validador poner false -->
+	</view-state>																						   <!-- si no se necesita prevenir los back en las jsp colocar preserve-->
+	
+										<!-- result="flowScope.user" result-type="dataModel" dataModel= alias tipo  de objeto Java -->
+	<action-state id="performNewUserAction">
+		<evaluate expression="userService.performNewUser(user)" result="flowScope.success" result-type="string" />
+		<transition to="showNewUserSuccessView" />
+		<transition on-exception="org.neos.webflow.exceptions.IncorrectNewUserException" to="showNewUserErrorView" />
+	</action-state>
+
+
+	<view-state id="showNewUserErrorView" view="newuser_error.jsp">
+		<transition to="showFormUser" />
+	</view-state>
+
+	<view-state id="showNewUserSuccessView" view="addNewPersonalUser.jsp"  model="personal" >
+		<transition  on="newPersonalDataUserEntered"  to="performNewPersonalAction"/>
+	</view-state>
+	
+	<action-state id="performNewPersonalAction">
+		<evaluate expression="userService.performNewPersonalData(personal)" result="flowScope.personal" result-type="org.neos.webflow.domain.Personal" />
+		<transition to="showNewPersonalDataSuccessView" />
+	</action-state>
+	
+	<view-state id="showNewPersonalDataSuccessView" view="addNewAddressUser.jsp">
+	</view-state>
+
+
+	<!-- <end-state id="displaynewUserSuccessView" view="/WEB-INF/flows/login/display_login_success.jsp"/> -->
+
+</flow>
